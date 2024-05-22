@@ -34,14 +34,21 @@ def create_item(code):
     conn.close()
     return item_id
 
-# Route to create a new item
 @app.route('/items', methods=['POST'])
 def create():
     if 'code' not in request.json:
         return jsonify({'error': 'Code is required'}), 400
+    
     code = request.json['code']
-    item_id = create_item(code)
-    return jsonify({'id': item_id}), 201
+    check = get_item_by_id(code)
+    
+    if check is None:
+        item_id = create_item(code)
+        return jsonify({'id': item_id}), 201
+    else:
+        return jsonify({'error': 'Code exists in the database'}), 400
+
+
 
 # Function to get an item by ID
 def get_item_by_id(item_id):
